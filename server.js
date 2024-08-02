@@ -73,14 +73,14 @@ app.post('/api/flow', async (req, res, next) => {
                         responseMessages = await handleService(req.sessionId, serviceId, messageContent, userLanguage);
                         break;
                     case "temple_services":
-                        responseMessages = await templeServices(req.sessionId, messageContent);
-                        responseMessages.push(await goBackToMainMenu(req.sessionId, userLanguage));
+                        responseMessages = await selectTempleService(req.sessionId, userLanguage);
+                        // responseMessages.push(await goBackToMainMenu(req.sessionId, userLanguage, userLanguage));
                         break;
-                    case "Souvenir":
-                        responseMessages = await handleSouvenir(req.sessionId, messageContent);
+                    case "souvenir":
+                        responseMessages = await handleSouvenir(req.sessionId, userLanguage);
                         break;
                     case "about_temple":
-                        responseMessages = await handleAboutTemple(req.sessionId, messageContent);
+                        responseMessages = await handleAboutTemple(req.sessionId, messageContent, userLanguage);
                         break;
                     default:
                         responseMessages.push('Unsupported list reply ID');
@@ -99,7 +99,7 @@ app.post('/api/flow', async (req, res, next) => {
                 case "temple_history":
                 case "about_skvt":
                 case "trust_officials":
-                    responseMessages = await handleButtonReply(req.sessionId, messageContent);
+                    responseMessages = await handleButtonReply(req.sessionId, messageContent.button_reply?.id, messageContent, userLanguage);
                     break;
                 default:
                     responseMessages.push('Unsupported button reply ID');
@@ -110,7 +110,7 @@ app.post('/api/flow', async (req, res, next) => {
         }
 
         console.log(responseMessages);
-        res.json({ messages: responseMessages, languages });
+        res.json({ messages: responseMessages });
     } catch (error) {
         next(error);
     }
@@ -123,14 +123,21 @@ async function sendWelcomeMessage(sessionId, userName, userLanguage) {
 
     const welcomeMsg = await sendMessage(sessionId, welcomeMessage);
     const languageMsg = await sendMessage(sessionId, languageSelectionMessage);
+    const RadioLanguages = await sendRadio(sessionId, languages)
 
-    return [welcomeMsg, languageMsg];
+    return [welcomeMsg, languageMsg, RadioLanguages];
 }
 
 // Function to handle selecting a service
-async function selectService(sessionId, languageCode, message) {
+async function selectService(sessionId, languageCode) {
+  
     const serviceOptions = labels[languageCode].options;
-    return [await sendMessage(sessionId, serviceOptions)];
+    return [await sendMessage(sessionId, labels[languageCode].header), await sendMessage(sessionId, labels[languageCode].body), await sendMessage(sessionId, labels[languageCode].footer), await sendMessage(sessionId, labels[languageCode].btn), await sendRadio(sessionId, serviceOptions)];
+}
+async function selectTempleService(sessionId, languageCode) {
+  
+    const serviceOptions = labels2[languageCode].options;
+    return [await sendMessage(sessionId, labels2[languageCode].header), await sendMessage(sessionId, labels2[languageCode].body), await sendMessage(sessionId, labels2[languageCode].footer), await sendMessage(sessionId, labels2[languageCode].btn), await sendRadio(sessionId, serviceOptions)];
 }
 
 // Function to send information about temple services
@@ -203,6 +210,9 @@ async function handleService(sessionId, serviceId, messageContent, userLanguage)
         case "how_to_reach":
             messages.push(await serviceResponse(sessionId, serviceId, userLanguage));
         break;
+        case "foreign_oci":
+            messages.push(await serviceResponse(sessionId, serviceId, userLanguage));
+        break;
         case "making_donation":
             messages.push(await serviceResponse(sessionId, serviceId, userLanguage));
             messages.push(await sendImage(sessionId, {
@@ -221,20 +231,28 @@ async function handleService(sessionId, serviceId, messageContent, userLanguage)
 }
 
 // Function to handle Souvenir information
-async function handleSouvenir(sessionId, messageContent) {
-    const souvenirMessage = "Here is the information about the available souvenirs.";
+async function handleSouvenir(sessionId, userLanguage) {
+    const souvenirMessage = responseLabels.souvenir[userLanguage];
     return [await sendMessage(sessionId, souvenirMessage)];
 }
 
 // Function to handle About Temple information
-async function handleAboutTemple(sessionId, messageContent) {
-    const aboutTempleMessage = "This temple has a rich history and cultural significance.";
-    return [await sendMessage(sessionId, aboutTempleMessage)];
+async function handleAboutTemple(sessionId, messageContent, userLanguage) {
+    let aboutTemple =responseLabels.about_temple[userLanguage];
+    console.log(aboutTemple);
+    
+    return [await sendMessage(sessionId, aboutTemple.header[0]), await sendImage(sessionId, {
+        type: "image",
+        image: {
+          link: aboutTemple.image,
+        },
+      }), await sendButtons(sessionId, aboutTemple.buttons)];
 }
 
 // Function to handle button replies
-async function handleButtonReply(sessionId, messageContent) {
-    const buttonReplyMessage = "Here is more information based on your selection.";
+async function handleButtonReply(sessionId, caseID, messageContent, userLanguage) {
+    const buttonReplyMessage = responseLabels.about_temple[userLanguage][caseID];
+    console.log(buttonReplyMessage);
     return [await sendMessage(sessionId, buttonReplyMessage)];
 }
 
@@ -270,6 +288,20 @@ async function sendImage(sessionId, imageData) {
         },
     };
     return message; // Return the image message object for the front end
+}
+
+async function sendRadio(sessionId, RadioOptions){
+    const message = {
+        radio: RadioOptions
+    }
+    return message;
+}
+
+async function sendButtons(sessionId, ButtonOptions){
+    const message = {
+        buttons: ButtonOptions
+    }
+    return message;
 }
 
 app.listen(port, () => {
