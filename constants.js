@@ -1,15 +1,76 @@
 const languages = [
-    { id: "lang_hi", title: "हिन्दी(Hindi)" },
-    { id: "lang_en", title: "English" },
-    { id: "lang_ta", title: "தமிழ் | Tamil" },
-    { id: "lang_te", title: "తెలుగు | Telugu" },
-    { id: "lang_or", title: "ଓଡ଼ିଆ | Odia" },
-    { id: "lang_mr", title: "मराठी | Marathi" },
-    { id: "lang_kn", title: "ಕನ್ನಡ |Kannada" },
-    { id: "lang_pa", title: "ਪੰਜਾਬੀ | Punjabi" },
-    { id: "lang_as", title: "অসমীয়া | Assamese" },
-    { id: "lang_bn", title: "বাংলা | Bengali" },
-  ];
+  {
+    type: "reply",
+    reply: {
+      id: "lang_hi",
+      title: "हिन्दी(Hindi)",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_en",
+      title: "English",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_ta",
+      title: "தமிழ் | Tamil",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_te",
+      title: "తెలుగు | Telugu",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_or",
+      title: "ଓଡ଼ିଆ | Odia",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_mr",
+      title: "मराठी | Marathi",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_kn",
+      title: "ಕನ್ನಡ |Kannada",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_pa",
+      title: "ਪੰਜਾਬੀ | Punjabi",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_as",
+      title: "অসমীয়া | Assamese",
+    },
+  },
+  {
+    type: "reply",
+    reply: {
+      id: "lang_bn",
+      title: "বাংলা | Bengali",
+    },
+  },
+];
+
   
   const languageKey = {
     lang_en: "English",
@@ -3232,8 +3293,8 @@ const languages = [
         { id: "temple_helpdesk", title: "Helpdesk Counters" },
         { id: "how_to_reach", title: "How to Reach?" },
         { id: "foreign_oci", title: "Foreigners/OCI Devotees" },
-        { id: "Souvenir", title: "Prasad & Souvenir" },
-        { id: "ask_question", title: "Ask Query/Feedback" },
+        { id: "souvenir", title: "Prasad & Souvenir" },
+        { id: "ask_yes", title: "Ask Query/Feedback" },
       ],
     },
     hi: {
