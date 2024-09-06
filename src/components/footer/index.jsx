@@ -1,5 +1,6 @@
 import React from "react";
 import "./footer.css";
+import send from '../../assets/sendIcon.svg';
 
 const Footer = ({ setInput, sendMessage, input }) => {
   return (
@@ -10,10 +11,10 @@ const Footer = ({ setInput, sendMessage, input }) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         placeholder="Type your message here..."
-        style={{ width: "80%", padding: "10px" }}
+        className="input"
       />
-      <button onClick={sendMessage} style={{ padding: "10px" }}>
-        Send
+      <button onClick={sendMessage}  className="sendBtn">
+        <img src={send} alt="send message" className="send" />
       </button>
     </div>
   );

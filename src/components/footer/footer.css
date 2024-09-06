@@ -1,3 +1,36 @@
-.footer{
-   background-color: orange; 
+.footer {
+   /* background-color: orange;  */
+   display: flex;
+   justify-content: space-between;
+   padding: 15px;
+   border-top: 1px solid #e1e1e1;
+   gap: 10px;
+}
+
+.input {
+   padding: 10px;
+   border-radius: 10px;
+   width: 100%;
+   border: 1px solid #bfbcbc;
+   outline-color: #9b9898;
+}
+
+.sendBtn {
+   border: none;
+   padding: 0px;
+   cursor: pointer;
+   background-color:white;
+   display: flex;
+   align-items: center;
+}
+
+.send {
+   width:26px;
+   height: 26px;
+   cursor: pointer;
+   transition: 0.3s;
+}
+
+.send:hover {
+   scale: 1.08;
 }
