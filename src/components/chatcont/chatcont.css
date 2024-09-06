@@ -1,0 +1,19 @@
+.superChatCont{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.chatcont{
+    display: block;
+    height: 500px;
+    overflow: hidden;
+}
+
+
+
+.things{
+    overflow-y: scroll;
+    height: 100%;
+}

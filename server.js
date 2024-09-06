@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 dotenv.config();
 
-const port = 5000;
+const port = 5001;
 
 // Middleware to generate or validate session ID
 app.use((req, res, next) => {

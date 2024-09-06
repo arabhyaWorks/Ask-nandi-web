@@ -1,0 +1,92 @@
+
+.header {
+    background-image: linear-gradient(
+      to right,
+      rgb(0, 97, 180),
+      rgb(216, 86, 112)
+    );
+    display: flex;
+    align-items: center;
+    overflow-y: hidden;
+    justify-content: space-between;
+    padding: 15px;
+  }
+  
+  .leftCont {
+    display: flex;
+  }
+  
+  .logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+  
+  .logoCont {
+    margin: 0px;
+    padding: 0px;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  
+  .titleCont {
+    color: white;
+    height: 50px;
+  }
+  
+  .heading {
+    margin: 0px;
+    padding: 0px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  
+  .subHeadingCont {
+    display: flex;
+    align-items: center;
+    margin-top: -4px;
+  }
+  
+  .subhcont {
+    height: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .subheading {
+    margin: 0px;
+    padding: 0px;
+    font-size: 13px;
+  }
+  
+  .bhasiniLogo {
+    height: 20px;
+    object-fit: cover;
+    overflow-y: hidden;
+    margin-bottom: -4px;
+    margin-left: 5px;
+  }
+  
+  .closeBtn {
+    width: 30px;
+    height: 30px;
+    padding: 3px;
+    transition: 0.5s;
+    border-radius: 50%;
+  }
+  
+  .closeBtn:hover {
+    cursor: pointer;
+    background-color: rgb(0, 0, 0, 0.1);
+  }
+  
+  .closeBtnContainer {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
