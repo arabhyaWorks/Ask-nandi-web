@@ -19,10 +19,12 @@ const Chatbot = () => {
   const [interactivePayload, setInteractivePayload] = useState(null);
   const [isAskingQuestion, setIsAskingQuestion] = useState(false);
 
-  // Log all state variables whenever they change
   useEffect(() => {
-    // console.log('isAskingQuestion:', isAskingQuestion);
-  }, [
+    console.log(messages);
+  }, [messages]);
+
+  // Log all state variables whenever they change
+  useEffect(() => {}, [
     messages,
     input,
     sessionId,
@@ -45,7 +47,7 @@ const Chatbot = () => {
         });
 
         const { headers, data } = response;
-        console.log("Response data:", data); // Log response data
+        // console.log("Response data:", data); // Log response data
         setSessionId(headers["session-id"]);
         const messages = data.messages.flat(); // Flatten the array if needed
         setMessages(messages);
@@ -68,6 +70,21 @@ const Chatbot = () => {
   const sendMessage = async () => {
     let messageType = "text";
     let messageContent = input;
+
+    if(input !== "") {
+      const replyMessage = {
+        // sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
+        type: "reply",
+        text: {
+          body: input,
+        },
+      };
+  
+      // Wrap replyMessage in an array before spreading
+      setMessages((prevMessages) => [...prevMessages, replyMessage]);
+    }
+
+    setInput("");
 
     if (interactivePayload) {
       messageType = "interactive";
@@ -97,7 +114,7 @@ const Chatbot = () => {
       setIsAskingQuestion(true);
     }
 
-    console.log("Sending request with payload:", payload);
+    // console.log("Sending request with payload:", payload);
 
     try {
       const response = await axios.post(
@@ -108,10 +125,20 @@ const Chatbot = () => {
         }
       );
 
-      console.log(response);
+      // console.log(response);
 
       // Reset asking question state if necessary
       if (isAskingQuestion) {
+        // const replyMessage = {
+        //   // sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
+        //   type: "reply",
+        //   text: {
+        //     body: input,
+        //   },
+        // };
+
+        // // Wrap replyMessage in an array before spreading
+        // setMessages((prevMessages) => [...prevMessages, replyMessage]);
         setIsAskingQuestion(false);
       }
 
@@ -119,19 +146,61 @@ const Chatbot = () => {
         ...prevMessages,
         ...response.data.messages,
       ]);
-      setInput("");
+      // setInput("");
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
+  // const handleRadioClick = (option) => {
+  //   // setInput(option.reply.title);
+
+  //   setInteractivePayload({
+  //     type: "list_reply",
+  //     list_reply: { id: option.reply.id },
+  //   });
+
+  //   const data = {
+  //     sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
+  //     type: "text",
+  //     text: {
+  //       body: "Do you want to go back to the main menu?",
+  //     },
+  //   };
+
+  //   const replyMessage = {
+  //     sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
+  //     type: "reply",
+  //     text: {
+  //       body: option.reply.id,
+  //     },
+  //   };
+
+  //   setMessages((prevMessages) => [...prevMessages, ...replyMessage]);
+  // };
+
   const handleRadioClick = (option) => {
-    setInput(option.reply.title);
     setInteractivePayload({
       type: "list_reply",
       list_reply: { id: option.reply.id },
     });
+
+    const replyMessage = {
+      // sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
+      type: "reply",
+      text: {
+        body: option.reply.title,
+      },
+    };
+
+    // Wrap replyMessage in an array before spreading
+    setMessages((prevMessages) => [...prevMessages, replyMessage]);
   };
+  useEffect(() => {
+    if (interactivePayload) {
+      sendMessage(interactivePayload.list_reply.id);
+    }
+  }, [interactivePayload]); // Trigger when interactivePayload is updated
 
   return (
     <div className="container">
@@ -183,7 +252,14 @@ const Chatbot = () => {
 
       <Header />
 
-      <ChatCont messages={messages} handleRadioClick={handleRadioClick} isAskingQuestion={isAskingQuestion} />
+      <ChatCont
+        // setInput, sendMessage,
+        setInput={setInput}
+        sendMessage={sendMessage}
+        messages={messages}
+        handleRadioClick={handleRadioClick}
+        isAskingQuestion={isAskingQuestion}
+      />
       <Footer
         input={input}
         setInput={setInput}
