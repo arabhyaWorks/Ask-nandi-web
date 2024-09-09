@@ -38,13 +38,16 @@ const Chatbot = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await axios.post("http://asknandi.shrikashivishwanath.org//api/flow", {
-          userName,
-          messageType: "text",
-          messageContent: "hi",
-          userState,
-          userLanguage,
-        });
+        const response = await axios.post(
+          "https://broadleaf-bright-flavor.glitch.me/api/flow",
+          {
+            userName,
+            messageType: "text",
+            messageContent: "hi",
+            userState,
+            userLanguage,
+          }
+        );
 
         const { headers, data } = response;
         // console.log("Response data:", data); // Log response data
@@ -71,28 +74,48 @@ const Chatbot = () => {
     let messageType = "text";
     let messageContent = input;
 
-    if(input !== "") {
+    if (input !== "") {
       const replyMessage = {
-        // sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
         type: "reply",
         text: {
           body: input,
         },
       };
-  
+
       // Wrap replyMessage in an array before spreading
       setMessages((prevMessages) => [...prevMessages, replyMessage]);
     }
 
     setInput("");
 
+    //   {
+    //     "type": "list_reply",
+    //     "list_reply": {
+    //         "id": "lang_en"
+    //     }
+    // }
+
+
+
     if (interactivePayload) {
       messageType = "interactive";
       messageContent = interactivePayload;
+      console.log("Interactive payload:", interactivePayload);
+
+      if (
+        interactivePayload &&
+        interactivePayload.list_reply &&
+        interactivePayload.list_reply.id.startsWith("lang_")
+      ) {
+        // setUserLanguage(interactivePayload.list_reply.id.slice(-2));
+        console.log("State", userLanguage, "current selected langu", interactivePayload.list_reply.id.slice(5));
+        setUserLanguage(interactivePayload.list_reply.id.slice(5));
+  
+      }
+
       setInteractivePayload(null); // Clear the interactive payload after sending
     }
 
-    // Update userState if asking a question
     const updatedUserState = isAskingQuestion
       ? { ...userState, isAskingQuestion: true }
       : userState;
@@ -105,7 +128,6 @@ const Chatbot = () => {
       userLanguage,
     };
 
-    // Check if the payload should set isAskingQuestion to true
     if (
       interactivePayload &&
       interactivePayload.list_reply &&
@@ -114,31 +136,16 @@ const Chatbot = () => {
       setIsAskingQuestion(true);
     }
 
-    // console.log("Sending request with payload:", payload);
-
     try {
       const response = await axios.post(
-        "http://asknandi.shrikashivishwanath.org//api/flow",
+        "https://broadleaf-bright-flavor.glitch.me/api/flow",
         payload,
         {
           headers: { "session-id": sessionId },
         }
       );
 
-      // console.log(response);
-
-      // Reset asking question state if necessary
       if (isAskingQuestion) {
-        // const replyMessage = {
-        //   // sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
-        //   type: "reply",
-        //   text: {
-        //     body: input,
-        //   },
-        // };
-
-        // // Wrap replyMessage in an array before spreading
-        // setMessages((prevMessages) => [...prevMessages, replyMessage]);
         setIsAskingQuestion(false);
       }
 
@@ -200,60 +207,11 @@ const Chatbot = () => {
     if (interactivePayload) {
       sendMessage(interactivePayload.list_reply.id);
     }
-  }, [interactivePayload]); // Trigger when interactivePayload is updated
+  }, [interactivePayload]);
 
   return (
     <div className="container">
-      {/* <div className="topContainer"> */}
-
-      {/* Chatcont */}
-      {/* <div className="superChatCont">
-        <div
-          // style={{
-          //   // height: "400px",
-          //   overflowY: "scroll",
-          //   border: "1px solid #ccc",
-          //   padding: "10px",
-          // }}
-
-          className="chatcont"
-        >
-          {messages.map((message, index) => (
-            <div key={index} style={{ marginBottom: "10px" }}>
-              {message.text && <div>{message.text.body}</div>}
-              {message.image && (
-                <img
-                  src={message.image.link}
-                  alt="Image"
-                  style={{ maxWidth: "100%" }}
-                />
-              )}
-              {message.radio && (
-                <div>
-                  {message.radio.map((option, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleRadioClick(option)}
-                      style={{ margin: "5px" }}
-                    >
-                      {option.reply.title}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          {isAskingQuestion && <div>Please type your question</div>}
-        </div>
-        </div> */}
-      {/* </div> */}
-
-      {/* Footer*/}
-
-      {/* <Header /> */}
-
       <ChatCont
-        // setInput, sendMessage,
         setInput={setInput}
         sendMessage={sendMessage}
         messages={messages}
