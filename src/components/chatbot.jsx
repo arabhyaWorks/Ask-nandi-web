@@ -250,7 +250,7 @@ const Chatbot = () => {
 
       {/* Footer*/}
 
-      <Header />
+      {/* <Header /> */}
 
       <ChatCont
         // setInput, sendMessage,
