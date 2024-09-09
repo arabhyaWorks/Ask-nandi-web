@@ -38,7 +38,7 @@ const Chatbot = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await axios.post("http://localhost:5001/api/flow", {
+        const response = await axios.post("http://asknandi.shrikashivishwanath.org//api/flow", {
           userName,
           messageType: "text",
           messageContent: "hi",
@@ -118,7 +118,7 @@ const Chatbot = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5001/api/flow",
+        "http://asknandi.shrikashivishwanath.org//api/flow",
         payload,
         {
           headers: { "session-id": sessionId },
