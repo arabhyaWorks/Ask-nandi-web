@@ -74,7 +74,7 @@ const Chatbot = () => {
 
     fetchInitialData();
     // console.log("Initial data fetched");
-    gothit();
+    // gothit();
   }, [someData]); // Only depend on userName and userLanguage
 
   const sendMessage = async () => {
