@@ -8,6 +8,13 @@ import bhasiniLogo from "../assets/bhasini.png";
 import Header from "./header/index.jsx";
 import ChatCont from "./chatcont";
 import Footer from "./footer";
+// const endpoint = "http://localhost:5001";
+
+import database from "../../firebase.js";
+import { set, ref, push, update, child, onValue, get } from "firebase/database";
+
+// const endpoint = "https://shimmering-alder-shock.glitch.me";
+const endpoint = "https://broadleaf-bright-flavor.glitch.me"
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -15,9 +22,10 @@ const Chatbot = () => {
   const [sessionId, setSessionId] = useState(null);
   const [userState, setUserState] = useState({});
   const [userLanguage, setUserLanguage] = useState("en");
-  const [userName, setUserName] = useState("User");
+  const [userName, setUserName] = useState("Devotee");
   const [interactivePayload, setInteractivePayload] = useState(null);
   const [isAskingQuestion, setIsAskingQuestion] = useState(false);
+  const [someData, setSomeData] = useState(null);
 
   useEffect(() => {
     console.log(messages);
@@ -38,16 +46,13 @@ const Chatbot = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await axios.post(
-          "https://broadleaf-bright-flavor.glitch.me/api/flow",
-          {
-            userName,
-            messageType: "text",
-            messageContent: "hi",
-            userState,
-            userLanguage,
-          }
-        );
+        const response = await axios.post(endpoint + "/api/flow", {
+          userName,
+          messageType: "text",
+          messageContent: "hi",
+          userState,
+          userLanguage,
+        });
 
         const { headers, data } = response;
         // console.log("Response data:", data); // Log response data
@@ -68,7 +73,9 @@ const Chatbot = () => {
     };
 
     fetchInitialData();
-  }, [userName, userLanguage]); // Only depend on userName and userLanguage
+    // console.log("Initial data fetched");
+    gothit();
+  }, [someData]); // Only depend on userName and userLanguage
 
   const sendMessage = async () => {
     let messageType = "text";
@@ -95,8 +102,6 @@ const Chatbot = () => {
     //     }
     // }
 
-
-
     if (interactivePayload) {
       messageType = "interactive";
       messageContent = interactivePayload;
@@ -108,9 +113,13 @@ const Chatbot = () => {
         interactivePayload.list_reply.id.startsWith("lang_")
       ) {
         // setUserLanguage(interactivePayload.list_reply.id.slice(-2));
-        console.log("State", userLanguage, "current selected langu", interactivePayload.list_reply.id.slice(5));
+        console.log(
+          "State",
+          userLanguage,
+          "current selected langu",
+          interactivePayload.list_reply.id.slice(5)
+        );
         setUserLanguage(interactivePayload.list_reply.id.slice(5));
-  
       }
 
       setInteractivePayload(null); // Clear the interactive payload after sending
@@ -137,13 +146,9 @@ const Chatbot = () => {
     }
 
     try {
-      const response = await axios.post(
-        "https://broadleaf-bright-flavor.glitch.me/api/flow",
-        payload,
-        {
-          headers: { "session-id": sessionId },
-        }
-      );
+      const response = await axios.post(endpoint + "/api/flow", payload, {
+        headers: { "session-id": sessionId },
+      });
 
       if (isAskingQuestion) {
         setIsAskingQuestion(false);
@@ -203,6 +208,45 @@ const Chatbot = () => {
     // Wrap replyMessage in an array before spreading
     setMessages((prevMessages) => [...prevMessages, replyMessage]);
   };
+
+  function gothit() {
+    const dbRef = ref(database);
+    var data = [];
+    // console.log("htitting database");
+
+    get(child(dbRef, `ask_nandi_web/hit`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const value = parseInt(snapshot.val());
+          // console.log(`${options} value:`, value);
+          data.push(value + 1);
+          // console.log(
+          //   "increasing: ",
+          //   value + 1,
+          //   " array: ",
+          //   data,
+          //   "length :",
+          //   data.length,
+          //   "last element: ",
+          //   data[data.length - 1]
+          // );
+
+          // console.log("perfoming actions");
+          console.log("data:", data[0]);
+          if (data.length > 0) {
+            set(ref(database, `ask_nandi_web/hit`), data[data.length - 1]);
+          } else {
+            set(ref(database, `ask_nandi_web/hit`), 1);
+          }
+        } else {
+          set(ref(database, `ask_nandi_web/hit`), 1);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   useEffect(() => {
     if (interactivePayload) {
       sendMessage(interactivePayload.list_reply.id);
