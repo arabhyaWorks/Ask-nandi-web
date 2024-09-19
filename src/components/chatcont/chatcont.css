@@ -1,143 +1,50 @@
-.superChatCont {
+.chat-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.chatcont {
-    display: block;
-    height: 500px;
-    overflow: hidden;
-}
-
-
-
-.things {
-    overflow-y: scroll;
-    height: 100%;
-    /* background-color: red; */
-    padding: 0px 15px;
-    background-color: white;
-    font-size: 14px;
-}
-
-.messageText {
-    /* background-color: #f9f9f9; */
-    /* background-color: #e9e8e8; */
-    background-color: #f9f9f9;
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 20px;
-    border-top-left-radius: 0px;
-    /* margin-right: 70px; */
-    text-align: left;
-    overflow-wrap: break-word;
-    /* box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1); */
-    box-shadow: 0 0 2px #aaaaaaa3;
-    /* margin-top: 10px; */
-    width: 70%;
-
-}
-
-.messageReply {
-    /* background-color: #f9f9f9; */
-    /* background-color: #e9e8e8; */
-    background-color: #0d67c9;
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 20px;
-    border-bottom-right-radius: 0px;
-    /* margin-right: 70px; */
-    text-align: left;
-    overflow-wrap: break-word;
-    /* box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1); */
-    box-shadow: 0 0 2px #aaaaaaa3;
-    /* margin-top: 10px; */
-    /* width: 70%; */
-    color: white;
-    align-self: flex-end;
-
-
-}
-
-.messageImage{
-    width: 70%;
-    /* height: 100%; */
-    border-radius: 10px;
-    /* border: 1px solid #d1d1d1; */
-    /* box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1); */
-    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08); */
-    box-shadow: 0 0 2px #aaa;
-    margin-left: 40px;
-    padding: 5px;
-
-}
-
-.sideLogo {
-    /* margin-right: 70px; */
-    display: flex;
     gap: 10px;
-}
-
-.sidelogoimg{
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    /* border: 1px solid #d1d1d172; */
-    /* box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1); */
-    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08); */
-    box-shadow: 0 0 2px #aaa;
-}
-
-.messageButton {
-    display: flex;
-    /* justify-content: flex-end; */
-    /* margin-top: 10px; */
-    flex-direction: column;
-    margin-right: 140px;
-    /* background-color: red; */
-    margin-bottom: 10px;
-    text-align: left;
-    border-radius: 15px;
-    /* border-radius: 20px; */
-    background-color: #f9f9f9e2;
-    /* background-color: #f9f9f9; */
-    /* border: 1px solid #d1d1d1; */
-    box-shadow: 0 0 2px #aaaaaa;
-
-    margin-left: 40px;
-    /* background-color: red; */
-
-
-}
-
-.messageButton button {
+    padding: 20px;
+    height: 500px; /* Adjust the height according to your layout */
+    overflow-y: auto; /* Allow scrolling if the messages exceed container height */
+    background-color: #f1f1f1; /* Light background for the message area */
+    border-radius: 10px;
+    border: 1px solid #ccc; /* Optional border */
+  }
+  
+  .message-box {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .message-box.reply {
+    align-self: flex-start; /* Align reply messages to the left */
+  }
+  
+  .message-box.language,
+  .message-box.option {
+    align-self: flex-end; /* Align language and option buttons to the right */
+  }
+  
+  .language-btn,
+  .option-btn {
+    background-color: #007BFF;
+    color: white;
     border: none;
-    padding: 0px;
+    padding: 10px 20px;
+    font-size: 16px;
     cursor: pointer;
-    text-align: left;
-    /* padding: 0px 15px; */
-    /* padding: 10px; */
-    /* padding: 13px 16px; */
-    /* padding: 10px 13px; */
-    padding: 8px 11px;
-    transition: 0.2s;
-    color: #384248;
-    font-weight: 550;
-    font-size: 13px;
-    background-color: transparent;
-    /* box-shadow: 0px 1px 0px #d1d1d1; */
-
-}
-
-.messageButton button:hover {
-    background-color: #e9e8e8;
-}
-
-
-
-.btnTxt {
-    /* text-align: left; */
-}
+    border-radius: 5px;
+    margin: 5px 0;
+  }
+  
+  .language-btn:hover,
+  .option-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .message-text {
+    font-size: 14px;
+    color: #333;
+  }
+  

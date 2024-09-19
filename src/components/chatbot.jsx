@@ -1,271 +1,160 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./chatbot.css";
 import closeButton from "../assets/closeBtn.svg";
 import logo from "../assets/logo.jpg";
 import bhasiniLogo from "../assets/bhasini.png";
 
-import Header from "./header/index.jsx";
 import ChatCont from "./chatcont";
 import Footer from "./footer";
-// const endpoint = "http://localhost:5001";
-
-import database from "../../firebase.js";
-import { set, ref, push, update, child, onValue, get } from "firebase/database";
-
-// const endpoint = "https://shimmering-alder-shock.glitch.me";
-const endpoint = "https://broadleaf-bright-flavor.glitch.me"
+import { labels2 } from "../../labels.js"; // Adjust the path if necessary
+import { languageKey } from "../../lang.js"; // Language keys for selection
+import { responseLabels } from "../../constants.js"; // Import responseLabels
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [sessionId, setSessionId] = useState(null);
-  const [userState, setUserState] = useState({});
-  const [userLanguage, setUserLanguage] = useState("en");
-  const [userName, setUserName] = useState("Devotee");
-  const [interactivePayload, setInteractivePayload] = useState(null);
-  const [isAskingQuestion, setIsAskingQuestion] = useState(false);
-  const [someData, setSomeData] = useState(null);
+  const [sessionId, setSessionId] = useState("mock-session-id"); // Mock session ID
+  const [userLanguage, setUserLanguage] = useState("en"); // Default language is English
+  const [selectedOption, setSelectedOption] = useState(null); // Track selected service option
 
+  // Fetch initial data including language options
   useEffect(() => {
-    console.log(messages);
-  }, [messages]);
+    const fetchInitialData = () => {
+      setSessionId("mock-session-id"); // Mock session ID
 
-  // Log all state variables whenever they change
-  useEffect(() => {}, [
-    messages,
-    input,
-    sessionId,
-    userState,
-    userLanguage,
-    userName,
-    interactivePayload,
-    isAskingQuestion,
-  ]);
+      const initialMessages = [
+        { type: "reply", text: { body: "Hi, how are you?" } },
+        { type: "reply", text: { body: "Please choose your language:" } },
+      ];
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const response = await axios.post(endpoint + "/api/flow", {
-          userName,
-          messageType: "text",
-          messageContent: "hi",
-          userState,
-          userLanguage,
-        });
+      setMessages(initialMessages);
 
-        const { headers, data } = response;
-        // console.log("Response data:", data); // Log response data
-        setSessionId(headers["session-id"]);
-        const messages = data.messages.flat(); // Flatten the array if needed
-        setMessages(messages);
-
-        // Check if the response should set isAskingQuestion to true
-        if (data.list_reply && data.list_reply.id === "ask_yes") {
-          setIsAskingQuestion(true);
-        }
-
-        // Update userState based on server response if needed
-        setUserState(data.userState || {});
-      } catch (error) {
-        console.error("Error:", error);
-      }
+      // Display each language option in a separate message with buttons
+      Object.keys(languageKey).forEach((key) => {
+        const languageMessage = {
+          type: "language",
+          text: { body: `${languageKey[key]} (${key})` },
+          replyId: `lang_${key}`, // Use this reply ID to track which language is selected
+        };
+        setMessages((prevMessages) => [...prevMessages, languageMessage]);
+      });
     };
 
     fetchInitialData();
-    // console.log("Initial data fetched");
-    // gothit();
-  }, [someData]); // Only depend on userName and userLanguage
+  }, []);
 
-  const sendMessage = async () => {
-    let messageType = "text";
-    let messageContent = input;
+  // Handle language selection when a user clicks on a language
+  const handleLanguageClick = (replyId) => {
+    const selectedLanguage = replyId.slice(5); // Remove "lang_" prefix to get the language code
+    setUserLanguage(selectedLanguage);
 
-    if (input !== "") {
-      const replyMessage = {
+    // Get labels for the selected language
+    const languageLabels = labels2[selectedLanguage];
+
+    // Add confirmation and display the relevant message based on the selected language
+    const confirmationMessage = {
+      type: "reply",
+      text: { body: `You have selected ${languageKey[selectedLanguage]} as your language.` },
+    };
+
+    const headerMessage = {
+      type: "reply",
+      text: { body: languageLabels.header },
+    };
+
+    const bodyMessage = {
+      type: "reply",
+      text: { body: languageLabels.body },
+    };
+
+    const footerMessage = {
+      type: "reply",
+      text: { body: languageLabels.footer },
+    };
+
+    // Collect all service options dynamically
+    const optionMessages = languageLabels.options.map((option) => ({
+      type: "option",
+      text: { body: option.title },
+      replyId: option.id, // Assign the service ID to replyId for future use
+    }));
+
+    // Add all messages (confirmation, header, body, footer, options) in one go
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      confirmationMessage,
+      headerMessage,
+      bodyMessage,
+      footerMessage,
+      ...optionMessages,
+    ]);
+  };
+
+  // Handle option click (for service selection)
+  const handleOptionClick = (replyId) => {
+    const selectedOption = labels2[userLanguage].options.find(option => option.id === replyId);
+    if (!selectedOption) {
+      console.error(`Option with ID ${replyId} not found in labels2 for language ${userLanguage}`);
+      return;
+    }
+
+    setSelectedOption(selectedOption);
+
+    if (replyId === "about_temple") {
+      // Handle specific case for `about_temple`
+      const templeContent = responseLabels.about_temple[userLanguage];
+      const imageUrl = templeContent.image; 
+      const imageMessage = { type: "image", url: imageUrl };
+
+      const contentMessages = [
+        { type: "reply", text: { body: templeContent.header.join(" ") } },
+        ...templeContent.temple_history.map(line => ({ type: "reply", text: { body: line } })),
+        ...templeContent.about_skvt.map(line => ({ type: "reply", text: { body: line } })),
+        ...templeContent.trust_officials.map(line => ({ type: "reply", text: { body: line } })),
+        imageMessage,
+      ];
+
+      setMessages((prevMessages) => [...prevMessages, ...contentMessages]);
+    } else {
+      // General option handling
+      const selectedMessage = {
         type: "reply",
-        text: {
-          body: input,
-        },
+        text: { body: `You have selected ${selectedOption.title}.` },
       };
 
-      // Wrap replyMessage in an array before spreading
-      setMessages((prevMessages) => [...prevMessages, replyMessage]);
-    }
+      setMessages((prevMessages) => [...prevMessages, selectedMessage]);
 
-    setInput("");
-
-    //   {
-    //     "type": "list_reply",
-    //     "list_reply": {
-    //         "id": "lang_en"
-    //     }
-    // }
-
-    if (interactivePayload) {
-      messageType = "interactive";
-      messageContent = interactivePayload;
-      console.log("Interactive payload:", interactivePayload);
-
-      if (
-        interactivePayload &&
-        interactivePayload.list_reply &&
-        interactivePayload.list_reply.id.startsWith("lang_")
-      ) {
-        // setUserLanguage(interactivePayload.list_reply.id.slice(-2));
-        console.log(
-          "State",
-          userLanguage,
-          "current selected langu",
-          interactivePayload.list_reply.id.slice(5)
-        );
-        setUserLanguage(interactivePayload.list_reply.id.slice(5));
+      // Fetch response based on the selected service and language
+      const responseMessages = responseLabels[replyId]?.[userLanguage] || [];
+      if (responseMessages.length === 0) {
+        const errorMessage = {
+          type: "reply",
+          text: { body: "Sorry, we couldn't find a response for this option." },
+        };
+        setMessages((prevMessages) => [...prevMessages, errorMessage]);
+        return;
       }
 
-      setInteractivePayload(null); // Clear the interactive payload after sending
-    }
+      // Map through the array of response messages and add them individually
+      const responseMessageObjects = responseMessages.map((responseLine, index) => ({
+        type: "reply",
+        text: { body: responseLine },
+      }));
 
-    const updatedUserState = isAskingQuestion
-      ? { ...userState, isAskingQuestion: true }
-      : userState;
-
-    const payload = {
-      userName,
-      messageType,
-      messageContent,
-      userState: updatedUserState,
-      userLanguage,
-    };
-
-    if (
-      interactivePayload &&
-      interactivePayload.list_reply &&
-      interactivePayload.list_reply.id === "ask_yes"
-    ) {
-      setIsAskingQuestion(true);
-    }
-
-    try {
-      const response = await axios.post(endpoint + "/api/flow", payload, {
-        headers: { "session-id": sessionId },
-      });
-
-      if (isAskingQuestion) {
-        setIsAskingQuestion(false);
-      }
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        ...response.data.messages,
-      ]);
-      // setInput("");
-    } catch (error) {
-      console.error("Error:", error);
+      setMessages((prevMessages) => [...prevMessages, ...responseMessageObjects]);
     }
   };
-
-  // const handleRadioClick = (option) => {
-  //   // setInput(option.reply.title);
-
-  //   setInteractivePayload({
-  //     type: "list_reply",
-  //     list_reply: { id: option.reply.id },
-  //   });
-
-  //   const data = {
-  //     sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
-  //     type: "text",
-  //     text: {
-  //       body: "Do you want to go back to the main menu?",
-  //     },
-  //   };
-
-  //   const replyMessage = {
-  //     sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
-  //     type: "reply",
-  //     text: {
-  //       body: option.reply.id,
-  //     },
-  //   };
-
-  //   setMessages((prevMessages) => [...prevMessages, ...replyMessage]);
-  // };
-
-  const handleRadioClick = (option) => {
-    setInteractivePayload({
-      type: "list_reply",
-      list_reply: { id: option.reply.id },
-    });
-
-    const replyMessage = {
-      // sessionId: "0f4dd371-a675-4489-8965-1e0eeaa07d9f",
-      type: "reply",
-      text: {
-        body: option.reply.title,
-      },
-    };
-
-    // Wrap replyMessage in an array before spreading
-    setMessages((prevMessages) => [...prevMessages, replyMessage]);
-  };
-
-  function gothit() {
-    const dbRef = ref(database);
-    var data = [];
-    // console.log("htitting database");
-
-    get(child(dbRef, `ask_nandi_web/hit`))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const value = parseInt(snapshot.val());
-          // console.log(`${options} value:`, value);
-          data.push(value + 1);
-          // console.log(
-          //   "increasing: ",
-          //   value + 1,
-          //   " array: ",
-          //   data,
-          //   "length :",
-          //   data.length,
-          //   "last element: ",
-          //   data[data.length - 1]
-          // );
-
-          // console.log("perfoming actions");
-          console.log("data:", data[0]);
-          if (data.length > 0) {
-            set(ref(database, `ask_nandi_web/hit`), data[data.length - 1]);
-          } else {
-            set(ref(database, `ask_nandi_web/hit`), 1);
-          }
-        } else {
-          set(ref(database, `ask_nandi_web/hit`), 1);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-  useEffect(() => {
-    if (interactivePayload) {
-      sendMessage(interactivePayload.list_reply.id);
-    }
-  }, [interactivePayload]);
 
   return (
     <div className="container">
-      <ChatCont
-        setInput={setInput}
-        sendMessage={sendMessage}
-        messages={messages}
-        handleRadioClick={handleRadioClick}
-        isAskingQuestion={isAskingQuestion}
+      <ChatCont 
+        messages={messages} 
+        handleLanguageClick={handleLanguageClick} 
+        handleOptionClick={handleOptionClick} 
       />
       <Footer
         input={input}
         setInput={setInput}
-        sendMessage={sendMessage}
         closeButton={closeButton}
         logo={logo}
         bhasiniLogo={bhasiniLogo}

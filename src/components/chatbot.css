@@ -3,3 +3,28 @@
   flex-direction: column;
   height: 600px;
 }
+
+.option-btn {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.option-btn:hover {
+  background-color: #45a049;
+}
+
+.temple-image {
+  width: 100%;
+  height: auto;
+  max-width: 600px; /* Adjust based on your layout */
+  display: block;
+}
