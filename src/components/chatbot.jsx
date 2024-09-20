@@ -9,6 +9,7 @@ import Footer from "./footer";
 import { labels2 } from "../../labels.js"; // Adjust the path if necessary
 import { languageKey } from "../../lang.js"; // Language keys for selection
 import { responseLabels } from "../../constants.js"; // Import responseLabels
+import axios from 'axios'; // Add axios for API requests
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -136,13 +137,38 @@ const Chatbot = () => {
       }
 
       // Map through the array of response messages and add them individually
-      const responseMessageObjects = responseMessages.map((responseLine, index) => ({
+      const responseMessageObjects = responseMessages.map((responseLine) => ({
         type: "reply",
         text: { body: responseLine },
       }));
 
       setMessages((prevMessages) => [...prevMessages, ...responseMessageObjects]);
     }
+  };
+
+  // Send message (Post user input to server and fetch response)
+  const sendMessage = async () => {
+    if (input.trim() === "") return;
+    const userMessage = { type: "reply", text: { body: input } };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    try {
+      const response = await axios.post(
+        "http://ec2-3-86-240-66.compute-1.amazonaws.com/ask",
+        { question: input },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      const answer = response.data.answer;
+
+      const botReply = { type: "reply", text: { body: answer } };
+      setMessages((prevMessages) => [...prevMessages, botReply]);
+    } catch (error) {
+      console.error("Error fetching bot response:", error);
+      const errorMessage = { type: "reply", text: { body: "Sorry, an error occurred while fetching the response." } };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    }
+
+    setInput(""); // Clear input field
   };
 
   return (
@@ -155,6 +181,7 @@ const Chatbot = () => {
       <Footer
         input={input}
         setInput={setInput}
+        sendMessage={sendMessage} // Pass sendMessage handler to Footer
         closeButton={closeButton}
         logo={logo}
         bhasiniLogo={bhasiniLogo}
